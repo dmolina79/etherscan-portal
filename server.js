@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
 require('dotenv').config();
+require("isomorphic-fetch");
 const app = express();
 const mongoInit = require('./api/db/mongoInit');
 const api = require('./api');
