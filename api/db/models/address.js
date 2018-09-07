@@ -3,6 +3,7 @@
 
 const mongoose = require('mongoose');
 const uniqueValidator = require('mongoose-unique-validator');
+const TransactionSchema = require('./transaction');
 
 const { Schema } = mongoose;
 
@@ -18,7 +19,7 @@ const AddressSchema = new Schema({
   balanceInWei: {
     type: Number,
   },
-  // transactions: [TransactionSchema],
+  transactions: [TransactionSchema],
   createdAt: {
     type: Date,
     default: Date.now,
