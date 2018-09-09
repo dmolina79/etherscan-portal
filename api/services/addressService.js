@@ -25,10 +25,8 @@ module.exports = ({ config, db }) => {
     }
 
     const _getAddressTxs = async (queryAddress, queryOptions) => {
-        const query = _buildQuery(queryAddress, queryOptions);
-        console.log('query', query._conditions);    
+        const query = _buildQuery(queryAddress, queryOptions);  
         const addressInfo = await query.exec();
-        console.log('addressInfo', addressInfo);
 
         if (addressInfo === null || addressInfo.length === 0 || addressInfo[0] === null) {
             return null;
@@ -36,7 +34,7 @@ module.exports = ({ config, db }) => {
 
         const { address, transactions } = addressInfo[0];
         return {
-            address,
+            address: queryAddress,
             totalTransactions: transactions.length,
             transactions
         }
@@ -44,43 +42,25 @@ module.exports = ({ config, db }) => {
 
     const _buildQuery = (queryAddress, queryOptions) => {
         let query;
-        let match = { '$and': [] };
+        let match = [];
 
         if (queryOptions) {
             if (queryAddress) {
-                match['$and'].push({ address: queryAddress }); 
+                match.push({ $match: { address: queryAddress} }); 
             } else {
                 throw Error('Error: Argument address expected');
             }
-            if (queryOptions.startBlock) {
-                // match['$and'].push({ transactions: { "$elemMatch": { timeStamp: { "$gte": parseInt(queryOptions.startBlock) } } } }); 
-                match['$and'].push({ 'transactions.blockNumber' : { "$eq": queryOptions.startBlock } }); 
+            match.push({ $unwind: '$transactions' });
+            if (queryOptions.startBlock) {              
+                match.push({ $match: { 'transactions.blockNumber': { $gte: parseInt(queryOptions.startBlock) } } });                   
             }
+            if (queryOptions.endBlock) {
+                match.push({ $match: { 'transactions.blockNumber': { $lte: parseInt(queryOptions.endBlock) } } }); 
+            }
+            match.push({ $group: { _id: '$_id$',  transactions: { $push: '$transactions'} } }); 
         }
 
-        console.log('match', match);
-
-        if (queryOptions && queryOptions.limit) {
-            query = Address.find(match, { transactions : { $slice: -parseInt(queryOptions.limit) } });
-        } else {
-            query = Address.find(match);
-        }
-        
-        // if (queryOptions) {
-        //     if (queryAddress) {
-        //         query.where('address', queryAddress);
-        //     } else {
-        //         throw Error('Error: Argument address expected');
-        //     }
-        //     if (queryOptions.startBlock) {
-        //         query.where('transactions.blockNumber').gt(parseInt(queryOptions.startBlock));
-        //     }
-        //     if (queryOptions.sort) {
-        //         if (queryOptions.sort ==='DES') {
-        //             query.sort('-transactions.blockNumber');
-        //         }   
-        //     }
-        // }
+        query = Address.aggregate(match);
 
         return query;
     }
