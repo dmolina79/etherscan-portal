@@ -19,7 +19,9 @@ Loads a given ethereum address information into the MongoDB using information fr
 lists Address Information from loaded data in MongoDB
 *GET /api/transactions/:address
 lists Transaction Information for provided address from MongoDB
-(possible query params: ?startBlock and endBlock, both need to be a number and filter the transactions according to the values )
+(possible query params: ?startBlock and endBlock, both need to be a number and filter the transactions according to the values. Example:
+/api/transactions/0x0001?startBlock=31&endBlock=48
+ )
 
 ## Demo Site
 
