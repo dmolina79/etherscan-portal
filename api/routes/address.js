@@ -17,6 +17,21 @@ const buildRoute = ({ config, db}) => {
         }
     });
 
+    routes.get('/:address', async (req, res) => {
+        const { address } = req.params;
+        try {
+            const addressInfo = await addressService.getAddressInfo(address);
+            if (addressInfo !== null) {
+                return res.send({ ...addressInfo });
+            } else {
+                return res.status(404).json({ message: 'Address information not found'});
+            }
+            
+        } catch (error) {
+            return res.status(500).json({ message: `System Error: ${error}` }); 
+        }
+    });
+
     routes.post('/:address', async (req, res) => {
         const { address } = req.params;
 
