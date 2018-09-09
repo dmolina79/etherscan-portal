@@ -1,28 +1,21 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
+import LoadAddressPanel from './components/loadAddressPanel';
+import GetAddressInfoPanel from './components/getAddressInfoPanel';
+import TableResulsPanel from './components/tableResultsPanel';
 
 class App extends Component {
   state = {
-    response: ''
+    response: '',
+    addressInfo: null
   }
 
-  async componentDidMount () {
-    try {
-      const res = await this.callApi();
-      this.setState({ response: res.message });
-    } catch (e) {
-      console.log(e);
+  handleAddressInfo = async (addressInfo) => {
+    console.log('addressInfo', addressInfo);
+    if (addressInfo) {
+      this.setState({ addressInfo });
     }
-  }
-
-  callApi = async () => {
-    const res = await fetch('/api');
-    const body = await res.json();
-
-    if (res.status !== 200) throw Error(body.message);
-
-    return body;
   }
   
   render() {
@@ -30,11 +23,11 @@ class App extends Component {
       <div className="App">
         <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
+          <h1 className="App-title">Welcome to Etherscan Portal</h1>
         </header>
-        <p className="App-intro">
-          {this.state.response}
-        </p>
+        <LoadAddressPanel />
+        <GetAddressInfoPanel onAddressInfoLoad={this.handleAddressInfo} />
+        <TableResulsPanel addressInfo={this.state.addressInfo} />
       </div>
     );
   }
