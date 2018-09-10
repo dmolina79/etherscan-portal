@@ -2,8 +2,8 @@
 
 1. git clone project
 2. yarn install
-...Rename .env file and fill up values for mongo and Etherscan API
 3. mv .env.template .env 
+_Rename .env file and fill up values for mongo and Etherscan API_
 4. yarn run dev  or npm run dev
 
 
